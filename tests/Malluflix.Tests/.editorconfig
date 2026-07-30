@@ -1,0 +1,7 @@
+[*.cs]
+# Test method names conventionally use snake_case for readability.
+dotnet_diagnostic.CA1707.severity = none
+# xUnit's `Fact` methods are called via reflection; ignore "instance member could be static".
+dotnet_diagnostic.CA1822.severity = none
+# Tests may hard-code magic constants — no need to hoist them.
+dotnet_diagnostic.CA1024.severity = none

@@ -1,0 +1,6 @@
+@Malluflix.StremioAddon_HostAddress = http://localhost:5137
+
+GET {{Malluflix.StremioAddon_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

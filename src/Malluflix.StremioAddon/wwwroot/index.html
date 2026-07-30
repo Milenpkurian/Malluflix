@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>MalluFlix · Malayalam Movie Catalog for Stremio</title>
+        <link
+            rel="icon"
+            href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E%F0%9F%8E%AC%3C/text%3E%3C/svg%3E"
+        />
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+    <body>
+        <main>
+            <header>
+                <h1>MalluFlix</h1>
+                <p class="tagline">
+                    Latest Malayalam movies · in theaters · on OTT · straight
+                    into Stremio.
+                </p>
+            </header>
+
+            <section class="install">
+                <div class="btn-row">
+                    <a
+                        id="install"
+                        class="btn"
+                        href="#"
+                        data-fallback-host="localhost:5001"
+                        >Install in Stremio (desktop)</a
+                    >
+                    <a
+                        id="installWeb"
+                        class="btn btn-secondary"
+                        href="#"
+                        target="_blank"
+                        rel="noopener"
+                        >Install in Stremio Web</a
+                    >
+                </div>
+                <p class="manifest-hint">
+                    Or paste this URL into Stremio's addon search:
+                </p>
+                <div class="manifest-url">
+                    <code id="manifestUrl"
+                        >https://your-host/manifest.json</code
+                    >
+                    <button
+                        id="copyManifest"
+                        type="button"
+                        class="btn-copy"
+                        aria-label="Copy manifest URL"
+                    >
+                        Copy
+                    </button>
+                </div>
+            </section>
+
+            <section class="endpoints">
+                <h2>Endpoints</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Path</th>
+                            <th>Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>GET</td>
+                            <td><code>/manifest.json</code></td>
+                            <td>Stremio addon manifest</td>
+                        </tr>
+                        <tr>
+                            <td>GET</td>
+                            <td>
+                                <code
+                                    >/catalog/movie/malayalam_theaters.json</code
+                                >
+                            </td>
+                            <td>In theaters (IN)</td>
+                        </tr>
+                        <tr>
+                            <td>GET</td>
+                            <td>
+                                <code>/catalog/movie/malayalam_ott.json</code>
+                            </td>
+                            <td>On OTT (IN)</td>
+                        </tr>
+                        <tr>
+                            <td>GET</td>
+                            <td>
+                                <code
+                                    >/catalog/movie/malayalam_upcoming.json</code
+                                >
+                            </td>
+                            <td>Coming soon</td>
+                        </tr>
+                        <tr>
+                            <td>GET</td>
+                            <td>
+                                <code
+                                    >/catalog/movie/malayalam_genre_{tmdbGenreId}.json</code
+                                >
+                            </td>
+                            <td>By genre</td>
+                        </tr>
+                        <tr>
+                            <td>GET</td>
+                            <td>
+                                <code
+                                    >/catalog/movie/malayalam_theaters/search={q}.json</code
+                                >
+                            </td>
+                            <td>Search</td>
+                        </tr>
+                        <tr>
+                            <td>GET</td>
+                            <td><code>/meta/movie/{ttImdbId}.json</code></td>
+                            <td>Movie details</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <footer>
+                <p>
+                    <strong>Legal disclaimer.</strong> This project is a
+                    metadata proxy. It does not host, scrape, or redistribute
+                    any video content. All movie data is served through TMDB and
+                    Cinemeta under their respective terms of use. TMDB, Stremio,
+                    Cinemeta, and all third-party marks belong to their
+                    respective owners. This project is not affiliated with,
+                    endorsed by, or supported by any of them. Consumers are
+                    responsible for ensuring their streaming sources are lawful
+                    in their jurisdiction.
+                </p>
+            </footer>
+        </main>
+
+        <script>
+            (function () {
+                var host =
+                    window.location.host ||
+                    document.getElementById("install").dataset.fallbackHost;
+                var scheme =
+                    window.location.protocol === "https:" ? "https" : "http";
+                var manifestUrl = scheme + "://" + host + "/manifest.json";
+                var installLink = "stremio://" + host + "/manifest.json";
+                var webInstallLink =
+                    "https://web.stremio.com/#/addons?addon=" +
+                    encodeURIComponent(manifestUrl);
+                document
+                    .getElementById("install")
+                    .setAttribute("href", installLink);
+                document
+                    .getElementById("installWeb")
+                    .setAttribute("href", webInstallLink);
+                document.getElementById("manifestUrl").textContent =
+                    manifestUrl;
+
+                var copyBtn = document.getElementById("copyManifest");
+                copyBtn.addEventListener("click", function () {
+                    var done = function () {
+                        var original = copyBtn.textContent;
+                        copyBtn.textContent = "Copied!";
+                        setTimeout(function () {
+                            copyBtn.textContent = original;
+                        }, 1500);
+                    };
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard
+                            .writeText(manifestUrl)
+                            .then(done)
+                            .catch(function () {});
+                    } else {
+                        var ta = document.createElement("textarea");
+                        ta.value = manifestUrl;
+                        document.body.appendChild(ta);
+                        ta.select();
+                        try {
+                            document.execCommand("copy");
+                            done();
+                        } catch (e) {}
+                        document.body.removeChild(ta);
+                    }
+                });
+            })();
+        </script>
+    </body>
+</html>

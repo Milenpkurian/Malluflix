@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Malluflix.Api/Malluflix.Api.csproj" />
+    <Project Path="src/Malluflix.Core/Malluflix.Core.csproj" />
+    <Project Path="src/Malluflix.StremioAddon/Malluflix.StremioAddon.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Malluflix.Tests/Malluflix.Tests.csproj" />
+  </Folder>
+</Solution>
