@@ -20,13 +20,13 @@ RUN dotnet publish src/Malluflix.Api/Malluflix.Api.csproj \
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
+# Base image already ships a non-root `app` user (UID = $APP_UID).
 RUN apt-get update \
  && apt-get install -y --no-install-recommends curl \
- && rm -rf /var/lib/apt/lists/* \
- && groupadd -r app && useradd -r -g app app
-USER app
+ && rm -rf /var/lib/apt/lists/*
+USER $APP_UID
 
-COPY --from=build --chown=app:app /app/publish .
+COPY --from=build --chown=$APP_UID:$APP_UID /app/publish .
 
 ENV ASPNETCORE_URLS=http://+:8080 \
     ASPNETCORE_ENVIRONMENT=Production \
