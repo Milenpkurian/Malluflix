@@ -15,7 +15,10 @@
     <PackageVersion Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
-    <PackageVersion Include="Microsoft.OpenApi" Version="3.9.0" />
+    <!-- Stay on the 2.x line: Microsoft.AspNetCore.OpenApi 10.0.10's XML-comment source generator
+         emits `IOpenApiMediaType.Example = ...`, which is read-only in Microsoft.OpenApi 3.x.
+         2.7.5+ patches CVE-2026-49451 (GHSA-v5pm-xwqc-g5wc). -->
+    <PackageVersion Include="Microsoft.OpenApi" Version="2.11.0" />
   </ItemGroup>
 
   <ItemGroup Label="Test">

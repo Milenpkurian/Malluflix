@@ -3,7 +3,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
-COPY global.json Directory.Build.props Directory.Packages.props ./
+COPY global.json Directory.Build.props Directory.Packages.props .editorconfig ./
 COPY src/Malluflix.Core/Malluflix.Core.csproj src/Malluflix.Core/
 COPY src/Malluflix.StremioAddon/Malluflix.StremioAddon.csproj src/Malluflix.StremioAddon/
 RUN dotnet restore src/Malluflix.StremioAddon/Malluflix.StremioAddon.csproj
