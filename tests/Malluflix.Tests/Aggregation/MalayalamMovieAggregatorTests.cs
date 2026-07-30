@@ -48,7 +48,7 @@ public class MalayalamMovieAggregatorTests
     }
 
     [Fact]
-    public async Task GetOttAsync_uses_release_type_4()
+    public async Task GetOttAsync_uses_release_type_4_or_5()
     {
         var (sut, handler) = Build();
         handler.RespondJson("discover/movie",
@@ -57,7 +57,11 @@ public class MalayalamMovieAggregatorTests
         _ = await sut.GetOttAsync(skip: 0, CancellationToken.None);
 
         var discover = handler.Requests.Single(r => r.RequestUri!.AbsolutePath.EndsWith("/discover/movie"));
-        discover.RequestUri!.Query.Should().Contain("with_release_type=4");
+        var qs = discover.RequestUri!.Query;
+        qs.Should().Contain("with_release_type=4%7C5");
+        qs.Should().Contain("sort_by=release_date.desc");
+        qs.Should().Contain("release_date.lte=");
+        qs.Should().NotContain("release_date.gte=");
     }
 
     [Fact]

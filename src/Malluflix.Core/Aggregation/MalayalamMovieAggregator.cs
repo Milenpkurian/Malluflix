@@ -20,8 +20,8 @@ public sealed partial class MalayalamMovieAggregator(
     TimeProvider clock,
     ILogger<MalayalamMovieAggregator> logger) : IMalayalamMovieAggregator
 {
-    private const int TmdbReleaseTypeTheatrical = 3;
-    private const int TmdbReleaseTypeDigital = 4;
+    private const string TmdbReleaseTypeTheatrical = "3";
+    private const string TmdbReleaseTypeDigitalOrPhysical = "4|5";
     private const int SearchMaxPages = 3;
 
     [GeneratedRegex(@"^tt\d{5,10}$")]
@@ -34,11 +34,9 @@ public sealed partial class MalayalamMovieAggregator(
         DiscoverAsync(
             skip,
             releaseType: TmdbReleaseTypeTheatrical,
-            windowStart: Today().AddDays(-_tmdb.RecentReleaseWindowDays),
+            windowStart: null,
             windowEnd: Today(),
-            // release_date (not primary_release_date) scopes the window to with_release_type,
-            // so theaters and OTT don't collapse to the same "recent primary release" list.
-            dateField: "release_date",
+            dateField: "primary_release_date",
             sort: "primary_release_date.desc",
             genreId: null,
             markInTheaters: true,
@@ -48,11 +46,11 @@ public sealed partial class MalayalamMovieAggregator(
     public Task<IReadOnlyList<NormalizedMovie>> GetOttAsync(int skip, CancellationToken cancellationToken) =>
         DiscoverAsync(
             skip,
-            releaseType: TmdbReleaseTypeDigital,
-            windowStart: Today().AddDays(-_tmdb.RecentReleaseWindowDays),
+            releaseType: TmdbReleaseTypeDigitalOrPhysical,
+            windowStart: null,
             windowEnd: Today(),
             dateField: "release_date",
-            sort: "primary_release_date.desc",
+            sort: "release_date.desc",
             genreId: null,
             markInTheaters: false,
             markOnOtt: true,
@@ -174,7 +172,7 @@ public sealed partial class MalayalamMovieAggregator(
 
     private async Task<IReadOnlyList<NormalizedMovie>> DiscoverAsync(
         int skip,
-        int? releaseType,
+        string? releaseType,
         DateOnly? windowStart,
         DateOnly? windowEnd,
         string dateField,
@@ -214,7 +212,7 @@ public sealed partial class MalayalamMovieAggregator(
 
     private Dictionary<string, string?> BuildDiscoverQuery(
         int page,
-        int? releaseType,
+        string? releaseType,
         DateOnly? windowStart,
         DateOnly? windowEnd,
         string dateField,
@@ -230,9 +228,9 @@ public sealed partial class MalayalamMovieAggregator(
             ["include_adult"] = "false",
         };
 
-        if (releaseType is int rt)
+        if (!string.IsNullOrEmpty(releaseType))
         {
-            query["with_release_type"] = rt.ToString(CultureInfo.InvariantCulture);
+            query["with_release_type"] = releaseType;
         }
 
         if (windowStart is DateOnly start)
