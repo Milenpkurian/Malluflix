@@ -36,6 +36,9 @@ public sealed partial class MalayalamMovieAggregator(
             releaseType: TmdbReleaseTypeTheatrical,
             windowStart: Today().AddDays(-_tmdb.RecentReleaseWindowDays),
             windowEnd: Today(),
+            // release_date (not primary_release_date) scopes the window to with_release_type,
+            // so theaters and OTT don't collapse to the same "recent primary release" list.
+            dateField: "release_date",
             sort: "primary_release_date.desc",
             genreId: null,
             markInTheaters: true,
@@ -48,6 +51,7 @@ public sealed partial class MalayalamMovieAggregator(
             releaseType: TmdbReleaseTypeDigital,
             windowStart: Today().AddDays(-_tmdb.RecentReleaseWindowDays),
             windowEnd: Today(),
+            dateField: "release_date",
             sort: "primary_release_date.desc",
             genreId: null,
             markInTheaters: false,
@@ -60,6 +64,7 @@ public sealed partial class MalayalamMovieAggregator(
             releaseType: null,
             windowStart: Today().AddDays(1),
             windowEnd: Today().AddYears(1),
+            dateField: "primary_release_date",
             sort: "primary_release_date.asc",
             genreId: null,
             markInTheaters: false,
@@ -72,6 +77,7 @@ public sealed partial class MalayalamMovieAggregator(
             releaseType: null,
             windowStart: null,
             windowEnd: Today(),
+            dateField: "primary_release_date",
             sort: "primary_release_date.desc",
             genreId: tmdbGenreId,
             markInTheaters: false,
@@ -171,6 +177,7 @@ public sealed partial class MalayalamMovieAggregator(
         int? releaseType,
         DateOnly? windowStart,
         DateOnly? windowEnd,
+        string dateField,
         string sort,
         int? genreId,
         bool markInTheaters,
@@ -187,7 +194,7 @@ public sealed partial class MalayalamMovieAggregator(
 
         var pageTasks = Enumerable.Range(0, pagesNeeded)
             .Select(offset => tmdb.DiscoverAsync(
-                BuildDiscoverQuery(startingPage + offset, releaseType, windowStart, windowEnd, sort, genreId),
+                BuildDiscoverQuery(startingPage + offset, releaseType, windowStart, windowEnd, dateField, sort, genreId),
                 cancellationToken))
             .ToArray();
         var pages = await Task.WhenAll(pageTasks);
@@ -210,6 +217,7 @@ public sealed partial class MalayalamMovieAggregator(
         int? releaseType,
         DateOnly? windowStart,
         DateOnly? windowEnd,
+        string dateField,
         string sort,
         int? genreId)
     {
@@ -229,12 +237,12 @@ public sealed partial class MalayalamMovieAggregator(
 
         if (windowStart is DateOnly start)
         {
-            query["primary_release_date.gte"] = start.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+            query[$"{dateField}.gte"] = start.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
         }
 
         if (windowEnd is DateOnly end)
         {
-            query["primary_release_date.lte"] = end.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+            query[$"{dateField}.lte"] = end.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
         }
 
         if (genreId is int gid)
